@@ -2,11 +2,10 @@ package com.RutaMacht.RutaMacht.model;
 
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(callSuper = true)
+
 
 public class  Pasajero extends Usuario{
 
