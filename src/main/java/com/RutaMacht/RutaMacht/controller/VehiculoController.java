@@ -15,7 +15,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class VehiculoController {
 
-    @PostMapping("/api/vehiculo/crear")
+    @PostMapping
     public ResponseEntity<?> crear(
             @RequestBody Vehiculo vehiculo) {
 
