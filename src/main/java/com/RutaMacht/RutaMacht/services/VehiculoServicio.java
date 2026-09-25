@@ -11,13 +11,6 @@ import java.util.Objects;
 public class VehiculoServicio {
 
     private static final List<Vehiculo> vehiculos = new ArrayList<>();
-    private static final List<IActualizable> guiActualiza = new ArrayList<>();
-
-    public static void registrarGUI(IActualizable gui) {
-        if (gui != null && !guiActualiza.contains(gui)) {
-            guiActualiza.add(gui);
-        }
-    }
     public static void crearVehiculo(Vehiculo vehiculo) {
 
         if (vehiculo == null || !vehiculo.validarVehiculo()) {
@@ -95,10 +88,6 @@ public class VehiculoServicio {
         }
     }
     public static void actualizar() {
-
-        for (IActualizable act : guiActualiza) {
-            act.actualizar();
-        }
     }
 }
 

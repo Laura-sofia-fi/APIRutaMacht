@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class ConexionController {
     private final PasajeroClient pasajeroClient;
 
-    @GetMapping("/libros")
+    @GetMapping("/pasajero")
     public ResponseEntity<String> conexionPasajeros(){
         try{
             String respuesta = pasajeroClient.verificarConexion();

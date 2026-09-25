@@ -17,7 +17,6 @@ public class ConductorController {
 
     private final ConductorServicie conductorServicie;
 
-    // CREAR CONDUCTOR
     @PostMapping
     public ResponseEntity<?> crear(
             @RequestBody Conductor conductor) {
@@ -43,7 +42,6 @@ public class ConductorController {
     }
 
 
-    // LISTAR CONDUCTORES
     @GetMapping
     public ResponseEntity<?> listar() {
 
@@ -68,7 +66,6 @@ public class ConductorController {
     }
 
 
-    // BUSCAR CONDUCTOR POR ID
     @GetMapping("/{id}")
     public ResponseEntity<?> buscarPorId(
             @PathVariable String id) {
@@ -93,7 +90,6 @@ public class ConductorController {
     }
 
 
-    // ACTUALIZAR CONDUCTOR
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizar(
             @PathVariable String id,
@@ -136,7 +132,6 @@ public class ConductorController {
     }
 
 
-    // ELIMINAR CONDUCTOR
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminar(
             @PathVariable String id) {

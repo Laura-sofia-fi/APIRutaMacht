@@ -15,8 +15,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class VehiculoController {
 
-    // CREAR VEHÍCULO
-    @PostMapping
+    @PostMapping("/api/vehiculo/crear")
     public ResponseEntity<?> crear(
             @RequestBody Vehiculo vehiculo) {
 
@@ -42,7 +41,6 @@ public class VehiculoController {
     }
 
 
-    // LISTAR VEHÍCULOS
     @GetMapping
     public ResponseEntity<?> listar() {
 
@@ -68,7 +66,6 @@ public class VehiculoController {
     }
 
 
-    // BUSCAR VEHÍCULO POR PLACA
     @GetMapping("/{placa}")
     public ResponseEntity<?> buscarPorPlaca(
             @PathVariable String placa) {
@@ -97,7 +94,6 @@ public class VehiculoController {
     }
 
 
-    // ACTUALIZAR VEHÍCULO
     @PutMapping("/{placa}")
     public ResponseEntity<?> actualizar(
             @PathVariable String placa,
@@ -143,7 +139,6 @@ public class VehiculoController {
     }
 
 
-    // ELIMINAR VEHÍCULO
     @DeleteMapping("/{placa}")
     public ResponseEntity<?> eliminar(
             @PathVariable String placa) {
