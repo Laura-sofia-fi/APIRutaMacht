@@ -18,4 +18,15 @@ public class Vehiculo {
     private String color;
     private String tipoCombustible;
     private String numeroChasis;
+
+    public boolean validarVehiculo() {
+        return getPlaca() != null && !getPlaca().isBlank() &&
+                getMarca() != null && !getMarca().isBlank() &&
+                getModelo() != null && !getModelo().isBlank() &&
+                getColor() != null && !getColor().isBlank() &&
+                getTipoCombustible() != null && !getTipoCombustible().isBlank() &&
+                getNumeroChasis() != null && !getNumeroChasis().isBlank() &&
+                getAnio() > 0;
+    }
+
 }

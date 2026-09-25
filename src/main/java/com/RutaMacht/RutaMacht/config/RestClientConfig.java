@@ -7,16 +7,12 @@ import org.springframework.web.client.RestClient;
 
 @Configuration
 
-public class RestPasajeroConfig {
-
-    @Value("${api.libros.url}")
-    private String apipasajeroUrl;
-
+public class RestClientConfig {
 
     @Bean
     public RestClient restClient(){
         return RestClient.builder()
-                .baseUrl(apipasajeroUrl)
+                .baseUrl("http://localhost:8082")
                 .build();
     }
 }
