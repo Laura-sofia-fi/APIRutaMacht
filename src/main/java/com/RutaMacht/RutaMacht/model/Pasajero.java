@@ -1,13 +1,17 @@
 package com.RutaMacht.RutaMacht.model;
 
-import lombok.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 
 
-public class  Pasajero extends Usuario{
+public class  Pasajero extends Persona {
 
-    private int numAcom ;
+    private String fechaRegistro;
 }

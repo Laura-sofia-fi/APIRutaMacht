@@ -14,11 +14,14 @@ import lombok.ToString;
 @ToString
 
 
-public abstract class Usuario {
+public abstract class Persona {
 
-    private int id;
+    private String id;
     private String nombre;
-    private String Date;
-    private String nose;
+    private String apellido;
+    private String documento;
+    private String tipoDocumento;
+    private String telefono;
+    private String correo;
 
 }
