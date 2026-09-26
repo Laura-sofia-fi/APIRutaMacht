@@ -1,0 +1,50 @@
+<section class="panel">
+  <div class="panel-head">
+    <h2>{{ vehiculos.length }} {{ vehiculos.length === 1 ? 'vehículo' : 'vehículos' }}</h2>
+    <button class="btn btn-accent" (click)="abrirNuevo()">+ Nuevo vehículo</button>
+  </div>
+
+  <table *ngIf="vehiculos.length">
+    <thead>
+      <tr>
+        <th>Placa</th><th>Marca / Modelo</th><th>Año</th><th>Color</th><th>Combustible</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let v of vehiculos">
+        <td>{{ v.placa }}</td>
+        <td>{{ v.marca }} <span class="muted">{{ v.modelo }}</span></td>
+        <td class="muted">{{ v.anio }}</td>
+        <td class="muted">{{ v.color }}</td>
+        <td class="muted">{{ v.tipoCombustible }}</td>
+        <td class="actions">
+          <button class="btn btn-ghost btn-sm" (click)="abrirEditar(v)">Editar</button>
+          <button class="btn btn-ghost btn-sm" (click)="eliminar(v)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="empty" *ngIf="!vehiculos.length">Aún no hay vehículos registrados.</div>
+</section>
+
+<div class="overlay" *ngIf="modalAbierto">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>{{ editandoPlaca ? 'Editar' : 'Nuevo' }} vehículo</h2>
+      <button class="modal-close" (click)="cerrar()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label>Placa *</label><input [(ngModel)]="form.placa" [disabled]="!!editandoPlaca"></div>
+      <div class="field"><label>Marca *</label><input [(ngModel)]="form.marca"></div>
+      <div class="field"><label>Modelo *</label><input [(ngModel)]="form.modelo"></div>
+      <div class="field"><label>Año *</label><input type="number" [(ngModel)]="form.anio"></div>
+      <div class="field"><label>Color *</label><input [(ngModel)]="form.color"></div>
+      <div class="field"><label>Combustible *</label><input [(ngModel)]="form.tipoCombustible"></div>
+      <div class="field full"><label>N° de chasis *</label><input [(ngModel)]="form.numeroChasis"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" (click)="cerrar()">Cancelar</button>
+      <button class="btn btn-accent" (click)="guardar()">Guardar</button>
+    </div>
+  </div>
+</div>

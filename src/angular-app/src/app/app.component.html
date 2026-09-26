@@ -1,0 +1,21 @@
+<div class="wrap">
+  <header>
+    <div class="brand">Ruta<span>Macht</span> · Panel</div>
+    <div id="status-pill">
+      <span class="dot" [class.up]="apiArriba === true" [class.down]="apiArriba === false"></span>
+      <span>{{ apiArriba === null ? 'Comprobando API…' : (apiArriba ? 'API en línea' : 'API no disponible') }}</span>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab" [class.active]="tab === 'conductores'" (click)="tab = 'conductores'">Conductores</button>
+    <button class="tab" [class.active]="tab === 'vehiculos'" (click)="tab = 'vehiculos'">Vehículos</button>
+  </div>
+
+  <app-conductores *ngIf="tab === 'conductores'"></app-conductores>
+  <app-vehiculos *ngIf="tab === 'vehiculos'"></app-vehiculos>
+</div>
+
+<div class="toast-wrap">
+  <div class="toast" [class.err]="t.err" *ngFor="let t of toastService.toasts()">{{ t.text }}</div>
+</div>

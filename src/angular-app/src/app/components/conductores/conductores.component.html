@@ -1,0 +1,59 @@
+<section class="panel">
+  <div class="panel-head">
+    <h2>{{ conductores.length }} {{ conductores.length === 1 ? 'conductor' : 'conductores' }}</h2>
+    <button class="btn btn-accent" (click)="abrirNuevo()">+ Nuevo conductor</button>
+  </div>
+
+  <table *ngIf="conductores.length">
+    <thead>
+      <tr>
+        <th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Licencia</th><th>Estado</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let c of conductores">
+        <td>{{ c.nombre }} {{ c.apellido }}</td>
+        <td class="muted">{{ c.documento }}</td>
+        <td class="muted">{{ c.telefono }}</td>
+        <td>{{ c.licencia }} <span class="muted">({{ c.categoriaLicencia }})</span></td>
+        <td><span class="badge" [class.badge-ok]="c.estado" [class.badge-off]="!c.estado">{{ c.estado ? 'Activo' : 'Inactivo' }}</span></td>
+        <td class="actions">
+          <button class="btn btn-ghost btn-sm" (click)="abrirEditar(c)">Editar</button>
+          <button class="btn btn-ghost btn-sm" (click)="eliminar(c)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="empty" *ngIf="!conductores.length">Aún no hay conductores registrados.</div>
+</section>
+
+<div class="overlay" *ngIf="modalAbierto">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>{{ editandoId ? 'Editar' : 'Nuevo' }} conductor</h2>
+      <button class="modal-close" (click)="cerrar()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label>Nombre *</label><input [(ngModel)]="form.nombre"></div>
+      <div class="field"><label>Apellido *</label><input [(ngModel)]="form.apellido"></div>
+      <div class="field"><label>Tipo de documento *</label><input [(ngModel)]="form.tipoDocumento"></div>
+      <div class="field"><label>Documento *</label><input [(ngModel)]="form.documento"></div>
+      <div class="field"><label>Teléfono *</label><input [(ngModel)]="form.telefono"></div>
+      <div class="field"><label>Correo *</label><input [(ngModel)]="form.correo"></div>
+      <div class="field"><label>Licencia *</label><input [(ngModel)]="form.licencia"></div>
+      <div class="field"><label>Categoría licencia *</label><input [(ngModel)]="form.categoriaLicencia"></div>
+      <div class="field"><label>Vence licencia *</label><input type="date" [(ngModel)]="form.fechaVenciLicencia"></div>
+      <div class="field">
+        <label>Activo</label>
+        <select [(ngModel)]="form.estado">
+          <option [ngValue]="true">Activo</option>
+          <option [ngValue]="false">Inactivo</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" (click)="cerrar()">Cancelar</button>
+      <button class="btn btn-accent" (click)="guardar()">Guardar</button>
+    </div>
+  </div>
+</div>

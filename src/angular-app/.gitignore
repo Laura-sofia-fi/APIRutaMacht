@@ -1,0 +1,14 @@
+# dependencias
+/node_modules
+
+# build
+/dist
+/out-tsc
+
+# IDE
+.vscode/
+.idea/
+
+# sistema
+.DS_Store
+Thumbs.db
