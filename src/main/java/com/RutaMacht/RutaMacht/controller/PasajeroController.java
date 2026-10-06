@@ -1,114 +1,169 @@
 package com.RutaMacht.RutaMacht.controller;
 
-import com.RutaMacht.RutaMacht.model.IActualizable;
+import com.RutaMacht.RutaMacht.client.PasajeroClient;
 import com.RutaMacht.RutaMacht.model.Pasajero;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
+// Este controlador NO guarda pasajeros aquí: reenvía todo hacia la API
+// externa de pasajeros a través de PasajeroClient. Es el "puente" entre
+// el panel de Angular (que solo conoce esta API) y esa API externa.
+
+@RestController
+@RequestMapping("/api/pasajero")
+@RequiredArgsConstructor
 public class PasajeroController {
 
-        private static final List<Pasajero> pasajeros = new ArrayList<>();
-        private static final List<IActualizable> guiActualiza = new ArrayList<>();
+    private final PasajeroClient pasajeroClient;
 
-        public static void registrarGUI(IActualizable gui) {
-            if (gui != null && !guiActualiza.contains(gui)) {
-                guiActualiza.add(gui);
-            }
-        }
-        public static void crearPasajero(Pasajero pasajero) {
+    @PostMapping
+    public ResponseEntity<?> crear(@RequestBody Pasajero pasajero) {
 
-            if (pasajero == null || !pasajero.validarPasajero()) {
-                throw new RuntimeException(
-                        "ERROR: ingrese los datos correctamente!"
-                );
-            }
+        try {
 
-            if (buscarPasajero(pasajero.getId()) != null) {
-                throw new RuntimeException(
-                        "ERROR: ya existe un pasajero con el ID "
-                                + pasajero.getId()
-                );
-            }
+            Pasajero creado = pasajeroClient.crear(pasajero);
 
-            pasajeros.add(pasajero);
-            actualizar();
-        }
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(Map.of(
+                            "mensaje", "Pasajero creado correctamente.",
+                            "pasajero", creado
+                    ));
 
-        @org.jetbrains.annotations.UnmodifiableView
-        @org.jetbrains.annotations.Contract(pure = true)
-        public static @NonNull List<Pasajero> listarPasajeros() {
-            return Collections.unmodifiableList(pasajeros);
-        }
+        } catch (Exception e) {
 
-        public static @Nullable Pasajero buscarPasajero(String idUsuario) {
-
-            for (Pasajero pasajero : pasajeros) {
-
-                if (Objects.equals(
-                        pasajero.getId(),
-                        idUsuario)) {
-
-                    return pasajero;
-                }
-            }
-
-            return null;
-        }
-
-        public static void modificarPasajero(Pasajero pasajeroActualizado) {
-
-            if (pasajeroActualizado == null
-                    || !pasajeroActualizado.validarPasajero()) {
-
-                throw new RuntimeException(
-                        "ERROR: ingrese los datos correctamente!"
-                );
-            }
-
-            for (int i = 0; i < pasajeros.size(); i++) {
-
-                if (Objects.equals(
-                        pasajeros.get(i).getId(),
-                        pasajeroActualizado.getId())) {
-
-                    pasajeros.set(i, pasajeroActualizado);
-                    actualizar();
-                    return;
-                }
-            }
-
-            throw new RuntimeException(
-                    "No se encontró ningún pasajero con ese ID."
-            );
-        }
-
-        public static void eliminarPasajero(String idUsuario) {
-
-            boolean eliminado = pasajeros.removeIf(
-                    p -> Objects.equals(
-                            p.getId(),
-                            idUsuario
-                    )
-            );
-
-            if (eliminado) {
-                actualizar();
-            } else {
-                throw new RuntimeException(
-                        "No se encontró ningún pasajero con ese ID."
-                );
-            }
-        }
-
-        public static void actualizar() {
-
-            for (IActualizable act : guiActualiza) {
-                act.actualizar();
-            }
+            return ResponseEntity
+                    .status(HttpStatus.BAD_GATEWAY)
+                    .body(Map.of(
+                            "mensaje", "No se pudo crear el pasajero en la API externa."
+                    ));
         }
     }
+
+
+    @GetMapping
+    public ResponseEntity<?> listar() {
+
+        try {
+
+            List<Pasajero> pasajeros = pasajeroClient.listar();
+
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(Map.of(
+                            "mensaje", pasajeros.isEmpty()
+                                    ? "No hay pasajeros registrados."
+                                    : "Pasajeros consultados correctamente.",
+                            "pasajeros", pasajeros
+                    ));
+
+        } catch (Exception e) {
+
+            return ResponseEntity
+                    .status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body(Map.of(
+                            "mensaje", "La API de pasajeros no está disponible.",
+                            "pasajeros", List.of()
+                    ));
+        }
+    }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> buscarPorId(@PathVariable String id) {
+
+        Pasajero pasajero = pasajeroClient.buscarPorId(id);
+
+        if (pasajero == null) {
+
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(Map.of(
+                            "mensaje", "No se encontró un pasajero con el ID " + id
+                    ));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(Map.of(
+                        "mensaje", "Pasajero encontrado correctamente.",
+                        "pasajero", pasajero
+                ));
+    }
+
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizar(
+            @PathVariable String id,
+            @RequestBody Pasajero pasajero) {
+
+        try {
+
+            // Mantener el ID de la URL
+            pasajero.setId(id);
+
+            pasajeroClient.modificar(id, pasajero);
+
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(Map.of(
+                            "mensaje", "Pasajero actualizado correctamente.",
+                            "pasajero", pasajero
+                    ));
+
+        } catch (HttpClientErrorException.NotFound e) {
+
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(Map.of(
+                            "mensaje", "No se encontró un pasajero con el ID " + id
+                    ));
+
+        } catch (Exception e) {
+
+            return ResponseEntity
+                    .status(HttpStatus.BAD_GATEWAY)
+                    .body(Map.of(
+                            "mensaje", "No se pudo actualizar el pasajero en la API externa."
+                    ));
+        }
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminar(@PathVariable String id) {
+
+        try {
+
+            pasajeroClient.eliminar(id);
+
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(Map.of(
+                            "mensaje", "Pasajero eliminado correctamente."
+                    ));
+
+        } catch (HttpClientErrorException.NotFound e) {
+
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(Map.of(
+                            "mensaje", "No se encontró un pasajero con el ID " + id
+                    ));
+
+        } catch (Exception e) {
+
+            return ResponseEntity
+                    .status(HttpStatus.BAD_GATEWAY)
+                    .body(Map.of(
+                            "mensaje", "No se pudo eliminar el pasajero en la API externa."
+                    ));
+        }
+    }
+}

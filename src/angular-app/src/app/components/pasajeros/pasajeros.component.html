@@ -1,0 +1,51 @@
+<section class="panel">
+  <div class="panel-head">
+    <h2>{{ pasajeros.length }} {{ pasajeros.length === 1 ? 'pasajero' : 'pasajeros' }}</h2>
+    <button class="btn btn-accent" (click)="abrirNuevo()">+ Nuevo pasajero</button>
+  </div>
+
+  <table *ngIf="pasajeros.length">
+    <thead>
+      <tr>
+        <th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Registrado</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of pasajeros">
+        <td class="muted">{{ p.id }}</td>
+        <td>{{ p.nombre }} {{ p.apellido }}</td>
+        <td class="muted">{{ p.documento }}</td>
+        <td class="muted">{{ p.telefono }}</td>
+        <td class="muted">{{ p.fechaRegistro }}</td>
+        <td class="actions">
+          <button class="btn btn-ghost btn-sm" (click)="abrirEditar(p)">Editar</button>
+          <button class="btn btn-ghost btn-sm" (click)="eliminar(p)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="empty" *ngIf="!pasajeros.length">Aún no hay pasajeros registrados.</div>
+</section>
+
+<div class="overlay" *ngIf="modalAbierto">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>{{ editandoId ? 'Editar' : 'Nuevo' }} pasajero</h2>
+      <button class="modal-close" (click)="cerrar()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label>ID *</label><input [(ngModel)]="form.id" [disabled]="!!editandoId"></div>
+      <div class="field"><label>Nombre *</label><input [(ngModel)]="form.nombre"></div>
+      <div class="field"><label>Apellido *</label><input [(ngModel)]="form.apellido"></div>
+      <div class="field"><label>Tipo de documento *</label><input [(ngModel)]="form.tipoDocumento"></div>
+      <div class="field"><label>Documento *</label><input [(ngModel)]="form.documento"></div>
+      <div class="field"><label>Teléfono *</label><input [(ngModel)]="form.telefono"></div>
+      <div class="field"><label>Correo *</label><input [(ngModel)]="form.correo"></div>
+      <div class="field"><label>Fecha de registro *</label><input type="date" [(ngModel)]="form.fechaRegistro"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" (click)="cerrar()">Cancelar</button>
+      <button class="btn btn-accent" (click)="guardar()">Guardar</button>
+    </div>
+  </div>
+</div>

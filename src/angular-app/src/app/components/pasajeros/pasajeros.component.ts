@@ -1,32 +1,31 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Conductor } from '../../models/conductor.model';
-import { ConductorService } from '../../services/conductor.service';
+import { Pasajero } from '../../models/pasajero.model';
+import { PasajeroService } from '../../services/pasajero.service';
 import { ToastService } from '../../services/toast.service';
 
-function vacio(): Conductor {
+function vacio(): Pasajero {
   return {
     id: '', nombre: '', apellido: '', tipoDocumento: '', documento: '',
-    telefono: '', correo: '', licencia: '', categoriaLicencia: '',
-    fechaVenciLicencia: '', estado: true,
+    telefono: '', correo: '', fechaRegistro: new Date().toISOString().slice(0, 10),
   };
 }
 
 @Component({
-  selector: 'app-conductores',
+  selector: 'app-pasajeros',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './conductores.component.html',
+  templateUrl: './pasajeros.component.html',
 })
-export class ConductoresComponent implements OnInit {
-  private service = inject(ConductorService);
+export class PasajerosComponent implements OnInit {
+  private service = inject(PasajeroService);
   private toast = inject(ToastService);
 
-  conductores: Conductor[] = [];
+  pasajeros: Pasajero[] = [];
   modalAbierto = false;
   editandoId: string | null = null;
-  form: Conductor = vacio();
+  form: Pasajero = vacio();
 
   ngOnInit(): void {
     this.cargar();
@@ -34,8 +33,8 @@ export class ConductoresComponent implements OnInit {
 
   cargar(): void {
     this.service.listar().subscribe({
-      next: (res) => (this.conductores = res.conductores || []),
-      error: (e) => this.toast.show('No se pudieron cargar los conductores: ' + this.msg(e), true),
+      next: (res) => (this.pasajeros = res.pasajeros || []),
+      error: (e) => this.toast.show('No se pudieron cargar los pasajeros: ' + this.msg(e), true),
     });
   }
 
@@ -45,9 +44,9 @@ export class ConductoresComponent implements OnInit {
     this.modalAbierto = true;
   }
 
-  abrirEditar(c: Conductor): void {
-    this.editandoId = c.id ?? null;
-    this.form = { ...c };
+  abrirEditar(p: Pasajero): void {
+    this.editandoId = p.id;
+    this.form = { ...p };
     this.modalAbierto = true;
   }
 
@@ -56,9 +55,9 @@ export class ConductoresComponent implements OnInit {
   }
 
   guardar(): void {
-    const requeridos: (keyof Conductor)[] = [
+    const requeridos: (keyof Pasajero)[] = [
       'id', 'nombre', 'apellido', 'tipoDocumento', 'documento',
-      'telefono', 'correo', 'licencia', 'categoriaLicencia', 'fechaVenciLicencia',
+      'telefono', 'correo', 'fechaRegistro',
     ];
     for (const campo of requeridos) {
       if (!this.form[campo]) {
@@ -69,21 +68,21 @@ export class ConductoresComponent implements OnInit {
 
     if (this.editandoId) {
       this.service.actualizar(this.editandoId, this.form).subscribe({
-        next: () => { this.toast.show('Conductor actualizado correctamente.'); this.cerrar(); this.cargar(); },
+        next: () => { this.toast.show('Pasajero actualizado correctamente.'); this.cerrar(); this.cargar(); },
         error: (e) => this.toast.show(this.msg(e), true),
       });
     } else {
       this.service.crear(this.form).subscribe({
-        next: () => { this.toast.show('Conductor creado correctamente.'); this.cerrar(); this.cargar(); },
+        next: () => { this.toast.show('Pasajero creado correctamente.'); this.cerrar(); this.cargar(); },
         error: (e) => this.toast.show(this.msg(e), true),
       });
     }
   }
 
-  eliminar(c: Conductor): void {
-    if (!c.id || !confirm('¿Eliminar este conductor? Esta acción no se puede deshacer.')) return;
-    this.service.eliminar(c.id).subscribe({
-      next: () => { this.toast.show('Conductor eliminado correctamente.'); this.cargar(); },
+  eliminar(p: Pasajero): void {
+    if (!confirm('¿Eliminar este pasajero? Esta acción no se puede deshacer.')) return;
+    this.service.eliminar(p.id).subscribe({
+      next: () => { this.toast.show('Pasajero eliminado correctamente.'); this.cargar(); },
       error: (e) => this.toast.show(this.msg(e), true),
     });
   }

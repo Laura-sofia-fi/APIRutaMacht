@@ -1,4 +1,4 @@
-export interface Conductor {
+export interface Pasajero {
   id: string;
   nombre: string;
   apellido: string;
@@ -6,8 +6,5 @@ export interface Conductor {
   documento: string;
   telefono: string;
   correo: string;
-  licencia: string;
-  categoriaLicencia: string;
-  fechaVenciLicencia: string;
-  estado: boolean;
+  fechaRegistro: string;
 }

@@ -2,20 +2,21 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ConductoresComponent } from './components/conductores/conductores.component';
 import { VehiculosComponent } from './components/vehiculos/vehiculos.component';
+import { PasajerosComponent } from './components/pasajeros/pasajeros.component';
 import { StatusService } from './services/status.service';
 import { ToastService } from './services/toast.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, ConductoresComponent, VehiculosComponent],
+  imports: [CommonModule, ConductoresComponent, VehiculosComponent, PasajerosComponent],
   templateUrl: './app.component.html',
 })
 export class AppComponent implements OnInit {
   private statusService = inject(StatusService);
   toastService = inject(ToastService);
 
-  tab: 'conductores' | 'vehiculos' = 'conductores';
+  tab: 'conductores' | 'vehiculos' | 'pasajeros' = 'conductores';
   apiArriba: boolean | null = null;
 
   ngOnInit(): void {

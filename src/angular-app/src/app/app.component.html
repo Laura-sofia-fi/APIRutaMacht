@@ -10,10 +10,12 @@
   <div class="tabs">
     <button class="tab" [class.active]="tab === 'conductores'" (click)="tab = 'conductores'">Conductores</button>
     <button class="tab" [class.active]="tab === 'vehiculos'" (click)="tab = 'vehiculos'">Vehículos</button>
+    <button class="tab" [class.active]="tab === 'pasajeros'" (click)="tab = 'pasajeros'">Pasajeros</button>
   </div>
 
   <app-conductores *ngIf="tab === 'conductores'"></app-conductores>
   <app-vehiculos *ngIf="tab === 'vehiculos'"></app-vehiculos>
+  <app-pasajeros *ngIf="tab === 'pasajeros'"></app-pasajeros>
 </div>
 
 <div class="toast-wrap">
