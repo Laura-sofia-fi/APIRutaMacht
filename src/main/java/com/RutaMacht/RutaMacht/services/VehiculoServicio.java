@@ -1,6 +1,5 @@
 package com.RutaMacht.RutaMacht.services;
 
-import com.RutaMacht.RutaMacht.model.IActualizable;
 import com.RutaMacht.RutaMacht.model.Vehiculo;
 
 import java.util.ArrayList;

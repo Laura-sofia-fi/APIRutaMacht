@@ -9,23 +9,21 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/conexion")
 @RequiredArgsConstructor
-
 public class ConexionController {
     private final PasajeroClient pasajeroClient;
 
     @GetMapping("/pasajero")
-    public ResponseEntity<String> conexionPasajeros(){
-        try{
+    public ResponseEntity<String> conexionPasajeros() {
+        try {
             String respuesta = pasajeroClient.verificarConexion();
-
             System.out.println("respuesta" + respuesta);
-
             return ResponseEntity.ok(respuesta);
 
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.SERVICE_UNAVAILABLE)
                     .body("ApiPasajero no disponible");
         }
     }
 }
+
