@@ -15,6 +15,9 @@ export class ConductorService {
   listar(): Observable<ListaConductoresResp> {
     return this.http.get<ListaConductoresResp>(this.base);
   }
+  buscar(id: string): Observable<ConductorResp> {
+    return this.http.get<ConductorResp>(`${this.base}/${id}`);
+  }
   crear(c: Conductor): Observable<ConductorResp> {
     return this.http.post<ConductorResp>(this.base, c);
   }

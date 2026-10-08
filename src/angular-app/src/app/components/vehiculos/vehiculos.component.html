@@ -4,6 +4,12 @@
     <button class="btn btn-accent" (click)="abrirNuevo()">+ Nuevo vehículo</button>
   </div>
 
+  <div class="search-bar">
+    <input [(ngModel)]="busqueda" (keyup.enter)="buscar()" placeholder="Buscar vehículo por placa…">
+    <button class="btn btn-accent btn-sm" (click)="buscar()">Buscar</button>
+    <button class="btn btn-ghost btn-sm" *ngIf="busqueda" (click)="limpiarBusqueda()">Limpiar</button>
+  </div>
+
   <table *ngIf="vehiculos.length">
     <thead>
       <tr>
@@ -24,7 +30,7 @@
       </tr>
     </tbody>
   </table>
-  <div class="empty" *ngIf="!vehiculos.length">Aún no hay vehículos registrados.</div>
+  <div class="empty" *ngIf="!vehiculos.length">{{ busqueda ? 'Sin resultados para esa búsqueda.' : 'Aún no hay vehículos registrados.' }}</div>
 </section>
 
 <div class="overlay" *ngIf="modalAbierto">

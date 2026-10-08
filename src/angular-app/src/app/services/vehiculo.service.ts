@@ -15,6 +15,9 @@ export class VehiculoService {
   listar(): Observable<ListaVehiculosResp> {
     return this.http.get<ListaVehiculosResp>(this.base);
   }
+  buscar(placa: string): Observable<VehiculoResp> {
+    return this.http.get<VehiculoResp>(`${this.base}/${placa}`);
+  }
   crear(v: Vehiculo): Observable<VehiculoResp> {
     return this.http.post<VehiculoResp>(this.base, v);
   }

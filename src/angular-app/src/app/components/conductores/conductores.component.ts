@@ -24,6 +24,7 @@ export class ConductoresComponent implements OnInit {
   private toast = inject(ToastService);
 
   conductores: Conductor[] = [];
+  busqueda = '';
   modalAbierto = false;
   editandoId: string | null = null;
   form: Conductor = vacio();
@@ -37,6 +38,26 @@ export class ConductoresComponent implements OnInit {
       next: (res) => (this.conductores = res.conductores || []),
       error: (e) => this.toast.show('No se pudieron cargar los conductores: ' + this.msg(e), true),
     });
+  }
+
+  buscar(): void {
+    const termino = this.busqueda.trim();
+    if (!termino) {
+      this.cargar();
+      return;
+    }
+    this.service.buscar(termino).subscribe({
+      next: (res) => (this.conductores = res.conductor ? [res.conductor] : []),
+      error: (e) => {
+        this.conductores = [];
+        this.toast.show(this.msg(e), true);
+      },
+    });
+  }
+
+  limpiarBusqueda(): void {
+    this.busqueda = '';
+    this.cargar();
   }
 
   abrirNuevo(): void {

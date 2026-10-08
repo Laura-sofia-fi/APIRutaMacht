@@ -23,6 +23,7 @@ export class PasajerosComponent implements OnInit {
   private toast = inject(ToastService);
 
   pasajeros: Pasajero[] = [];
+  busqueda = '';
   modalAbierto = false;
   editandoId: string | null = null;
   form: Pasajero = vacio();
@@ -36,6 +37,26 @@ export class PasajerosComponent implements OnInit {
       next: (res) => (this.pasajeros = res.pasajeros || []),
       error: (e) => this.toast.show('No se pudieron cargar los pasajeros: ' + this.msg(e), true),
     });
+  }
+
+  buscar(): void {
+    const termino = this.busqueda.trim();
+    if (!termino) {
+      this.cargar();
+      return;
+    }
+    this.service.buscar(termino).subscribe({
+      next: (res) => (this.pasajeros = res.pasajero ? [res.pasajero] : []),
+      error: (e) => {
+        this.pasajeros = [];
+        this.toast.show(this.msg(e), true);
+      },
+    });
+  }
+
+  limpiarBusqueda(): void {
+    this.busqueda = '';
+    this.cargar();
   }
 
   abrirNuevo(): void {

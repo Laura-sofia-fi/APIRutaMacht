@@ -20,6 +20,7 @@ export class VehiculosComponent implements OnInit {
   private toast = inject(ToastService);
 
   vehiculos: Vehiculo[] = [];
+  busqueda = '';
   modalAbierto = false;
   editandoPlaca: string | null = null;
   form: Vehiculo = vacio();
@@ -33,6 +34,26 @@ export class VehiculosComponent implements OnInit {
       next: (res) => (this.vehiculos = res.vehiculos || []),
       error: (e) => this.toast.show('No se pudieron cargar los vehículos: ' + this.msg(e), true),
     });
+  }
+
+  buscar(): void {
+    const termino = this.busqueda.trim();
+    if (!termino) {
+      this.cargar();
+      return;
+    }
+    this.service.buscar(termino).subscribe({
+      next: (res) => (this.vehiculos = res.vehiculo ? [res.vehiculo] : []),
+      error: (e) => {
+        this.vehiculos = [];
+        this.toast.show(this.msg(e), true);
+      },
+    });
+  }
+
+  limpiarBusqueda(): void {
+    this.busqueda = '';
+    this.cargar();
   }
 
   abrirNuevo(): void {

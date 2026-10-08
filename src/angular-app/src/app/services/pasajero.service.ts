@@ -15,6 +15,9 @@ export class PasajeroService {
   listar(): Observable<ListaPasajerosResp> {
     return this.http.get<ListaPasajerosResp>(this.base);
   }
+  buscar(id: string): Observable<PasajeroResp> {
+    return this.http.get<PasajeroResp>(`${this.base}/${id}`);
+  }
   crear(p: Pasajero): Observable<PasajeroResp> {
     return this.http.post<PasajeroResp>(this.base, p);
   }
