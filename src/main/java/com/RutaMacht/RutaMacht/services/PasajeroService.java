@@ -29,6 +29,8 @@ public class PasajeroService {
             );
         }
 
+        validarFormato(pasajero);
+
         if (buscarPasajero(pasajero.getId()) != null) {
             throw new RuntimeException(
                     "ERROR: ya existe un pasajero con el ID "
@@ -68,6 +70,8 @@ public class PasajeroService {
             );
         }
 
+        validarFormato(pasajeroActualizado);
+
         for (int i = 0; i < pasajeros.size(); i++) {
 
             if (Objects.equals(
@@ -97,6 +101,25 @@ public class PasajeroService {
         } else {
             throw new RuntimeException(
                     "No se encontró ningún pasajero con ese ID."
+            );
+        }
+    }
+
+    // ---------- Validaciones de formato ----------
+
+    private void validarFormato(Pasajero pasajero) {
+
+        // Solo letras (con tildes y ñ) y espacios
+        if (!pasajero.getNombre().matches("[\\p{L} ]+")) {
+            throw new RuntimeException(
+                    "ERROR: el nombre solo puede contener letras."
+            );
+        }
+
+        // Solo dígitos
+        if (!pasajero.getId().matches("\\d+")) {
+            throw new RuntimeException(
+                    "ERROR: el ID solo puede contener números."
             );
         }
     }

@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-
 public class ConductorServicie {
 
     private final List<Conductor> conductores = new ArrayList<>();
@@ -29,6 +28,8 @@ public class ConductorServicie {
                     "ERROR: ingrese los datos correctamente!"
             );
         }
+
+        validarFormato(conductor);
 
         if (buscarConductor(conductor.getId()) != null) {
             throw new RuntimeException(
@@ -85,6 +86,8 @@ public class ConductorServicie {
             );
         }
 
+        validarFormato(conductorActualizado);
+
         for (int i = 0; i < conductores.size(); i++) {
 
             if (Objects.equals(
@@ -100,6 +103,25 @@ public class ConductorServicie {
         throw new RuntimeException(
                 "No se encontró ningún conductor con ese ID."
         );
+    }
+
+    // ---------- Validaciones de formato ----------
+
+    private void validarFormato(Conductor conductor) {
+
+        // Solo letras (con tildes y ñ) y espacios
+        if (!conductor.getNombre().matches("[\\p{L} ]+")) {
+            throw new RuntimeException(
+                    "ERROR: el nombre solo puede contener letras."
+            );
+        }
+
+        // Solo dígitos
+        if (!conductor.getId().matches("\\d+")) {
+            throw new RuntimeException(
+                    "ERROR: el ID solo puede contener números."
+            );
+        }
     }
 
     public void actualizar() {
