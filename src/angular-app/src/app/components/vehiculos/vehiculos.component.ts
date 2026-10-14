@@ -36,24 +36,20 @@ export class VehiculosComponent implements OnInit {
     });
   }
 
-  buscar(): void {
-    const termino = this.busqueda.trim();
-    if (!termino) {
-      this.cargar();
-      return;
-    }
-    this.service.buscar(termino).subscribe({
-      next: (res) => (this.vehiculos = res.vehiculo ? [res.vehiculo] : []),
-      error: (e) => {
-        this.vehiculos = [];
-        this.toast.show(this.msg(e), true);
-      },
-    });
+  // Filtra en vivo solo por placa: muestra lo que coincida con lo que se va escribiendo
+  get filtrados(): Vehiculo[] {
+    const t = this.normalizar(this.busqueda);
+    if (!t) return this.vehiculos;
+    return this.vehiculos.filter((x) => this.normalizar(x.placa).includes(t));
   }
 
   limpiarBusqueda(): void {
     this.busqueda = '';
-    this.cargar();
+  }
+
+  // Ignora mayúsculas y tildes: "garcia" encuentra "García"
+  private normalizar(v: unknown): string {
+    return String(v ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
   }
 
   abrirNuevo(): void {

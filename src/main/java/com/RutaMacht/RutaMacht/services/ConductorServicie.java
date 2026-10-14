@@ -105,21 +105,45 @@ public class ConductorServicie {
         );
     }
 
-    // ---------- Validaciones de formato ----------
-
     private void validarFormato(Conductor conductor) {
 
-        // Solo letras (con tildes y ñ) y espacios
         if (!conductor.getNombre().matches("[\\p{L} ]+")) {
             throw new RuntimeException(
                     "ERROR: el nombre solo puede contener letras."
             );
         }
 
-        // Solo dígitos
+        if (!conductor.getApellido().matches("[\\p{L} ]+")) {
+            throw new RuntimeException(
+                    "ERROR: el apellido solo puede contener letras."
+            );
+        }
+
         if (!conductor.getId().matches("\\d+")) {
             throw new RuntimeException(
                     "ERROR: el ID solo puede contener números."
+            );
+        }
+
+        if (!conductor.getDocumento().matches("\\d+")) {
+            throw new RuntimeException(
+                    "ERROR: el documento solo puede contener números."
+            );
+        }
+        try {
+            java.time.LocalDate vencimiento = java.time.LocalDate.parse(
+                    conductor.getFechaVenciLicencia(),
+                    java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            );
+
+            if (vencimiento.isBefore(java.time.LocalDate.now())) {
+                throw new RuntimeException(
+                        "ERROR: la licencia está vencida."
+                );
+            }
+        } catch (java.time.format.DateTimeParseException e) {
+            throw new RuntimeException(
+                    "ERROR: la fecha de vencimiento debe tener el formato yyyy-MM-dd."
             );
         }
     }

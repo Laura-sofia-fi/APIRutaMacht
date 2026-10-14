@@ -48,6 +48,7 @@ public class PasajeroService {
         return Collections.unmodifiableList(pasajeros);
     }
 
+    // Búsqueda exacta por ID (la usa crearPasajero para evitar duplicados)
     public Pasajero buscarPasajero(String id) {
 
         for (Pasajero pasajero : pasajeros) {
@@ -58,6 +59,32 @@ public class PasajeroService {
         }
 
         return null;
+    }
+
+    // Búsqueda con coincidencias parciales (para la GUI)
+    public List<Pasajero> buscarCoincidencias(String texto) {
+
+        if (texto == null || texto.trim().isEmpty()) {
+            return listarPasajeros();
+        }
+
+        String filtro = texto.trim().toLowerCase();
+        List<Pasajero> resultado = new ArrayList<>();
+
+        for (Pasajero p : pasajeros) {
+            if (contiene(p.getId(), filtro)
+                    || contiene(p.getNombre(), filtro)
+                    || contiene(p.getApellido(), filtro)
+                    || contiene(p.getDocumento(), filtro)) {
+                resultado.add(p);
+            }
+        }
+
+        return resultado;
+    }
+
+    private boolean contiene(String campo, String filtro) {
+        return campo != null && campo.toLowerCase().contains(filtro);
     }
 
     public void modificarPasajero(Pasajero pasajeroActualizado) {
@@ -105,14 +132,17 @@ public class PasajeroService {
         }
     }
 
-    // ---------- Validaciones de formato ----------
-
     private void validarFormato(Pasajero pasajero) {
 
-        // Solo letras (con tildes y ñ) y espacios
         if (!pasajero.getNombre().matches("[\\p{L} ]+")) {
             throw new RuntimeException(
                     "ERROR: el nombre solo puede contener letras."
+            );
+        }
+
+        if (!pasajero.getApellido().matches("[\\p{L} ]+")) {
+            throw new RuntimeException(
+                    "ERROR: el apellido solo puede contener letras."
             );
         }
 
@@ -122,8 +152,19 @@ public class PasajeroService {
                     "ERROR: el ID solo puede contener números."
             );
         }
-    }
 
+        if (!pasajero.getDocumento().matches("\\d+")) {
+            throw new RuntimeException(
+                    "ERROR: el documento solo puede contener números."
+            );
+        }
+
+        if (!pasajero.getTelefono().matches("\\d+")) {
+            throw new RuntimeException(
+                    "ERROR: el teléfono solo puede contener números."
+            );
+        }
+    }
     public void actualizar() {
 
         for (IActualizable act : guiActualiza) {

@@ -1,23 +1,22 @@
-<section class="panel">
+<section class="panel tema-vehiculos">
   <div class="panel-head">
-    <h2>{{ vehiculos.length }} {{ vehiculos.length === 1 ? 'vehículo' : 'vehículos' }}</h2>
+    <h2>{{ filtrados.length }} {{ filtrados.length === 1 ? 'vehículo' : 'vehículos' }}</h2>
     <button class="btn btn-accent" (click)="abrirNuevo()">+ Nuevo vehículo</button>
   </div>
 
   <div class="search-bar">
-    <input [(ngModel)]="busqueda" (keyup.enter)="buscar()" placeholder="Buscar vehículo por placa…">
-    <button class="btn btn-accent btn-sm" (click)="buscar()">Buscar</button>
+    <input [(ngModel)]="busqueda" placeholder="Buscar vehículo por placa…">
     <button class="btn btn-ghost btn-sm" *ngIf="busqueda" (click)="limpiarBusqueda()">Limpiar</button>
   </div>
 
-  <table *ngIf="vehiculos.length">
+  <table *ngIf="filtrados.length">
     <thead>
       <tr>
         <th>Placa</th><th>Marca / Modelo</th><th>Año</th><th>Color</th><th>Combustible</th><th></th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let v of vehiculos">
+      <tr *ngFor="let v of filtrados">
         <td>{{ v.placa }}</td>
         <td>{{ v.marca }} <span class="muted">{{ v.modelo }}</span></td>
         <td class="muted">{{ v.anio }}</td>
@@ -30,7 +29,7 @@
       </tr>
     </tbody>
   </table>
-  <div class="empty" *ngIf="!vehiculos.length">{{ busqueda ? 'Sin resultados para esa búsqueda.' : 'Aún no hay vehículos registrados.' }}</div>
+  <div class="empty" *ngIf="!filtrados.length">{{ busqueda ? 'Sin resultados para esa búsqueda.' : 'Aún no hay vehículos registrados.' }}</div>
 </section>
 
 <div class="overlay" *ngIf="modalAbierto">

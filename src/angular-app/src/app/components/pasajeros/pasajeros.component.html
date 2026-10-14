@@ -1,23 +1,22 @@
-<section class="panel">
+<section class="panel tema-pasajeros">
   <div class="panel-head">
-    <h2>{{ pasajeros.length }} {{ pasajeros.length === 1 ? 'pasajero' : 'pasajeros' }}</h2>
+    <h2>{{ filtrados.length }} {{ filtrados.length === 1 ? 'pasajero' : 'pasajeros' }}</h2>
     <button class="btn btn-accent" (click)="abrirNuevo()">+ Nuevo pasajero</button>
   </div>
 
   <div class="search-bar">
-    <input [(ngModel)]="busqueda" (keyup.enter)="buscar()" placeholder="Buscar pasajero por ID…">
-    <button class="btn btn-accent btn-sm" (click)="buscar()">Buscar</button>
+    <input [(ngModel)]="busqueda" placeholder="Buscar pasajero por ID…">
     <button class="btn btn-ghost btn-sm" *ngIf="busqueda" (click)="limpiarBusqueda()">Limpiar</button>
   </div>
 
-  <table *ngIf="pasajeros.length">
+  <table *ngIf="filtrados.length">
     <thead>
       <tr>
         <th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Registrado</th><th></th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let p of pasajeros">
+      <tr *ngFor="let p of filtrados">
         <td class="muted">{{ p.id }}</td>
         <td>{{ p.nombre }} {{ p.apellido }}</td>
         <td class="muted">{{ p.documento }}</td>
@@ -30,7 +29,7 @@
       </tr>
     </tbody>
   </table>
-  <div class="empty" *ngIf="!pasajeros.length">{{ busqueda ? 'Sin resultados para esa búsqueda.' : 'Aún no hay pasajeros registrados.' }}</div>
+  <div class="empty" *ngIf="!filtrados.length">{{ busqueda ? 'Sin resultados para esa búsqueda.' : 'Aún no hay pasajeros registrados.' }}</div>
 </section>
 
 <div class="overlay" *ngIf="modalAbierto">
@@ -43,7 +42,14 @@
       <div class="field"><label>ID *</label><input [(ngModel)]="form.id" [disabled]="!!editandoId"></div>
       <div class="field"><label>Nombre *</label><input [(ngModel)]="form.nombre"></div>
       <div class="field"><label>Apellido *</label><input [(ngModel)]="form.apellido"></div>
-      <div class="field"><label>Tipo de documento *</label><input [(ngModel)]="form.tipoDocumento"></div>
+      <div class="field">
+        <label>Tipo de documento *</label>
+        <select [(ngModel)]="form.tipoDocumento">
+          <option value="" disabled>Seleccione…</option>
+          <option *ngIf="form.tipoDocumento && !tiposDocumento.includes(form.tipoDocumento)" [value]="form.tipoDocumento">{{ form.tipoDocumento }}</option>
+          <option *ngFor="let t of tiposDocumento" [value]="t">{{ t }}</option>
+        </select>
+      </div>
       <div class="field"><label>Documento *</label><input [(ngModel)]="form.documento"></div>
       <div class="field"><label>Teléfono *</label><input [(ngModel)]="form.telefono"></div>
       <div class="field"><label>Correo *</label><input [(ngModel)]="form.correo"></div>

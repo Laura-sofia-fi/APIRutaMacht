@@ -10,6 +10,7 @@ import java.util.Objects;
 public class VehiculoServicio {
 
     private static final List<Vehiculo> vehiculos = new ArrayList<>();
+
     public static void crearVehiculo(Vehiculo vehiculo) {
 
         if (vehiculo == null || !vehiculo.validarVehiculo()) {
@@ -17,6 +18,8 @@ public class VehiculoServicio {
                     "ERROR: ingrese los datos correctamente!"
             );
         }
+
+        validarFormato(vehiculo);
 
         if (buscarVehiculo(vehiculo.getPlaca()) != null) {
             throw new RuntimeException(
@@ -55,6 +58,8 @@ public class VehiculoServicio {
             );
         }
 
+        validarFormato(vehiculoActualizado);
+
         for (int i = 0; i < vehiculos.size(); i++) {
 
             if (Objects.equals(
@@ -86,7 +91,38 @@ public class VehiculoServicio {
             );
         }
     }
+
+    private static void validarFormato(Vehiculo vehiculo) {
+
+        // Solo letras (con tildes y ñ) y espacios
+        if (!vehiculo.getMarca().matches("[\\p{L} ]+")) {
+            throw new RuntimeException(
+                    "ERROR: la marca solo puede contener letras."
+            );
+        }
+
+        if (!vehiculo.getColor().matches("[\\p{L} ]+")) {
+            throw new RuntimeException(
+                    "ERROR: el color solo puede contener letras."
+            );
+        }
+
+        if (!vehiculo.getTipoCombustible().matches("[\\p{L} ]+")) {
+            throw new RuntimeException(
+                    "ERROR: el combustible solo puede contener letras."
+            );
+        }
+        if (!vehiculo.getNumeroChasis().matches("[A-Za-z0-9]{17}")) {
+            throw new RuntimeException(
+                    "ERROR: el número de chasis debe tener exactamente 17 caracteres alfanuméricos."
+            );
+        }
+        if (!vehiculo.getPlaca().matches("[A-Za-z0-9]+")) {
+            throw new RuntimeException(
+                    "ERROR: la placa solo puede contener letras y números."
+            );
+        }
+    }
     public static void actualizar() {
     }
 }
-

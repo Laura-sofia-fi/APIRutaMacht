@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Conductor } from '../../models/conductor.model';
 import { ConductorService } from '../../services/conductor.service';
 import { ToastService } from '../../services/toast.service';
+import { TIPOS_DOCUMENTO } from '../../models/tipos-documento';
 
 function vacio(): Conductor {
   return {
@@ -23,6 +24,8 @@ export class ConductoresComponent implements OnInit {
   private service = inject(ConductorService);
   private toast = inject(ToastService);
 
+  tiposDocumento = TIPOS_DOCUMENTO;
+
   conductores: Conductor[] = [];
   busqueda = '';
   modalAbierto = false;
@@ -40,24 +43,20 @@ export class ConductoresComponent implements OnInit {
     });
   }
 
-  buscar(): void {
-    const termino = this.busqueda.trim();
-    if (!termino) {
-      this.cargar();
-      return;
-    }
-    this.service.buscar(termino).subscribe({
-      next: (res) => (this.conductores = res.conductor ? [res.conductor] : []),
-      error: (e) => {
-        this.conductores = [];
-        this.toast.show(this.msg(e), true);
-      },
-    });
+  // Filtra en vivo solo por ID: muestra lo que coincida con lo que se va escribiendo
+  get filtrados(): Conductor[] {
+    const t = this.normalizar(this.busqueda);
+    if (!t) return this.conductores;
+    return this.conductores.filter((x) => this.normalizar(x.id).includes(t));
   }
 
   limpiarBusqueda(): void {
     this.busqueda = '';
-    this.cargar();
+  }
+
+  // Ignora mayúsculas y tildes: "garcia" encuentra "García"
+  private normalizar(v: unknown): string {
+    return String(v ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
   }
 
   abrirNuevo(): void {

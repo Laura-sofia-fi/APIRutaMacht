@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Pasajero } from '../../models/pasajero.model';
 import { PasajeroService } from '../../services/pasajero.service';
 import { ToastService } from '../../services/toast.service';
+import { TIPOS_DOCUMENTO } from '../../models/tipos-documento';
 
 function vacio(): Pasajero {
   return {
@@ -22,6 +23,8 @@ export class PasajerosComponent implements OnInit {
   private service = inject(PasajeroService);
   private toast = inject(ToastService);
 
+  tiposDocumento = TIPOS_DOCUMENTO;
+
   pasajeros: Pasajero[] = [];
   busqueda = '';
   modalAbierto = false;
@@ -39,24 +42,20 @@ export class PasajerosComponent implements OnInit {
     });
   }
 
-  buscar(): void {
-    const termino = this.busqueda.trim();
-    if (!termino) {
-      this.cargar();
-      return;
-    }
-    this.service.buscar(termino).subscribe({
-      next: (res) => (this.pasajeros = res.pasajero ? [res.pasajero] : []),
-      error: (e) => {
-        this.pasajeros = [];
-        this.toast.show(this.msg(e), true);
-      },
-    });
+  // Filtra en vivo solo por ID: muestra lo que coincida con lo que se va escribiendo
+  get filtrados(): Pasajero[] {
+    const t = this.normalizar(this.busqueda);
+    if (!t) return this.pasajeros;
+    return this.pasajeros.filter((x) => this.normalizar(x.id).includes(t));
   }
 
   limpiarBusqueda(): void {
     this.busqueda = '';
-    this.cargar();
+  }
+
+  // Ignora mayúsculas y tildes: "garcia" encuentra "García"
+  private normalizar(v: unknown): string {
+    return String(v ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
   }
 
   abrirNuevo(): void {
