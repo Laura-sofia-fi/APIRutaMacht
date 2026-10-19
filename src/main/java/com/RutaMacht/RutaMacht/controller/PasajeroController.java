@@ -1,11 +1,14 @@
 package com.RutaMacht.RutaMacht.controller;
 
-import com.RutaMacht.RutaMacht.model.Pasajero;
-import com.RutaMacht.RutaMacht.services.PasajeroService;
+import com.RutaMacht.RutaMacht.client.PasajeroClient;
+import com.RutaMacht.RutaMacht.dto.PasajeroDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 
 import java.util.List;
 import java.util.Map;
@@ -15,144 +18,90 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PasajeroController {
 
-    private final PasajeroService pasajeroService;
+    private final PasajeroClient pasajeroClient;
 
     @PostMapping
-    public ResponseEntity<?> crear(
-            @RequestBody Pasajero pasajero) {
-
+    public ResponseEntity<?> crear(@RequestBody PasajeroDTO pasajero) {
         try {
-            Pasajero creado = pasajeroService.crearPasajero(pasajero);
-
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(Map.of(
-                            "mensaje", "Pasajero creado correctamente.",
-                            "pasajero", creado
-                    ));
-
-        } catch (RuntimeException e) {
-
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of(
-                            "mensaje", e.getMessage()
-                    ));
+            PasajeroDTO creado = pasajeroClient.crear(pasajero);
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                    "mensaje", "Pasajero creado correctamente.",
+                    "pasajero", creado));
+        } catch (HttpClientErrorException e) {
+            return errorDelServicio(e);
+        } catch (ResourceAccessException e) {
+            return servicioCaido();
         }
     }
-
 
     @GetMapping
     public ResponseEntity<?> listar() {
-
-        List<Pasajero> pasajeros =
-                pasajeroService.listarPasajeros();
-
-        if (pasajeros.isEmpty()) {
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(Map.of(
-                            "mensaje", "No hay pasajeros registrados.",
-                            "pasajeros", pasajeros
-                    ));
+        try {
+            List<PasajeroDTO> pasajeros = pasajeroClient.listar();
+            String mensaje = pasajeros.isEmpty()
+                    ? "No hay pasajeros registrados."
+                    : "Pasajeros consultados correctamente.";
+            return ResponseEntity.ok(Map.of(
+                    "mensaje", mensaje,
+                    "pasajeros", pasajeros));
+        } catch (ResourceAccessException e) {
+            return servicioCaido();
         }
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(Map.of(
-                        "mensaje", "Pasajeros consultados correctamente.",
-                        "pasajeros", pasajeros
-                ));
     }
-
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> buscarPorId(
-            @PathVariable String id) {
-
-        Pasajero pasajero =
-                pasajeroService.buscarPasajero(id);
-
-        if (pasajero == null) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(Map.of(
-                            "mensaje", "No se encontró un pasajero con el ID " + id
-                    ));
+    public ResponseEntity<?> buscarPorId(@PathVariable String id) {
+        try {
+            PasajeroDTO pasajero = pasajeroClient.buscarPorId(id);
+            if (pasajero == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                        "mensaje", "No se encontró un pasajero con el ID " + id));
+            }
+            return ResponseEntity.ok(Map.of(
+                    "mensaje", "Pasajero encontrado correctamente.",
+                    "pasajero", pasajero));
+        } catch (ResourceAccessException e) {
+            return servicioCaido();
         }
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(Map.of(
-                        "mensaje", "Pasajero encontrado correctamente.",
-                        "pasajero", pasajero
-                ));
     }
-
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> actualizar(
-            @PathVariable String id,
-            @RequestBody Pasajero pasajero) {
-
-        // Verificar que exista
-        Pasajero existente =
-                pasajeroService.buscarPasajero(id);
-
-        if (existente == null) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(Map.of(
-                            "mensaje", "No se encontró un pasajero con el ID " + id
-                    ));
-        }
-
+    public ResponseEntity<?> actualizar(@PathVariable String id, @RequestBody PasajeroDTO pasajero) {
         try {
-
-            // Nos aseguramos de que el objeto conserve el ID
             pasajero.setId(id);
-
-            pasajeroService.modificarPasajero(pasajero);
-
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(Map.of(
-                            "mensaje", "Pasajero actualizado correctamente.",
-                            "pasajero", pasajero
-                    ));
-
-        } catch (RuntimeException e) {
-
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of(
-                            "mensaje", e.getMessage()
-                    ));
+            pasajeroClient.modificar(id, pasajero);
+            return ResponseEntity.ok(Map.of(
+                    "mensaje", "Pasajero actualizado correctamente.",
+                    "pasajero", pasajero));
+        } catch (HttpClientErrorException e) {
+            return errorDelServicio(e);
+        } catch (ResourceAccessException e) {
+            return servicioCaido();
         }
     }
 
-
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> eliminar(
-            @PathVariable String id) {
-
+    public ResponseEntity<?> eliminar(@PathVariable String id) {
         try {
-
-            pasajeroService.eliminarPasajero(id);
-
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(Map.of(
-                            "mensaje", "Pasajero eliminado correctamente."
-                    ));
-
-        } catch (RuntimeException e) {
-
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(Map.of(
-                            "mensaje", e.getMessage()
-                    ));
+            pasajeroClient.eliminar(id);
+            return ResponseEntity.ok(Map.of("mensaje", "Pasajero eliminado correctamente."));
+        } catch (HttpClientErrorException e) {
+            return errorDelServicio(e);
+        } catch (ResourceAccessException e) {
+            return servicioCaido();
         }
+    }
+
+    // Reenvía tal cual el error que devolvió el servicio de pasajeros (400, 404...)
+    private ResponseEntity<?> errorDelServicio(HttpClientErrorException e) {
+        return ResponseEntity.status(e.getStatusCode())
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(e.getResponseBodyAsString());
+    }
+
+    // El 8082 no está corriendo o no responde
+    private ResponseEntity<?> servicioCaido() {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(Map.of(
+                "mensaje", "El servicio de pasajeros no está disponible."));
     }
 }

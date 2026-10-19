@@ -1,8 +1,7 @@
 package com.RutaMacht.RutaMacht.client;
 
-import com.RutaMacht.RutaMacht.model.Pasajero;
+import com.RutaMacht.RutaMacht.dto.PasajeroDTO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
@@ -15,6 +14,10 @@ public class PasajeroClient {
 
     private final RestClient restClient;
 
+    // El 8082 envuelve sus respuestas en {"mensaje": ..., "pasajero(s)": ...}
+    private record ListaRespuesta(String mensaje, List<PasajeroDTO> pasajeros) {}
+    private record PasajeroRespuesta(String mensaje, PasajeroDTO pasajero) {}
+
     public String verificarConexion() {
         return restClient.get()
                 .uri("/api/pasajeros/conexion")
@@ -22,33 +25,36 @@ public class PasajeroClient {
                 .body(String.class);
     }
 
-    public List<Pasajero> listar() {
-        return restClient.get()
+    public List<PasajeroDTO> listar() {
+        ListaRespuesta r = restClient.get()
                 .uri("/api/pasajeros")
                 .retrieve()
-                .body(new ParameterizedTypeReference<List<Pasajero>>() {});
+                .body(ListaRespuesta.class);
+        return r == null ? List.of() : r.pasajeros();
     }
 
-    public Pasajero buscarPorId(String id) {
+    public PasajeroDTO buscarPorId(String id) {
         try {
-            return restClient.get()
+            PasajeroRespuesta r = restClient.get()
                     .uri("/api/pasajeros/{id}", id)
                     .retrieve()
-                    .body(Pasajero.class);
+                    .body(PasajeroRespuesta.class);
+            return r == null ? null : r.pasajero();
         } catch (HttpClientErrorException.NotFound e) {
             return null;
         }
     }
 
-    public Pasajero crear(Pasajero pasajero) {
-        return restClient.post()
+    public PasajeroDTO crear(PasajeroDTO pasajero) {
+        PasajeroRespuesta r = restClient.post()
                 .uri("/api/pasajeros")
                 .body(pasajero)
                 .retrieve()
-                .body(Pasajero.class);
+                .body(PasajeroRespuesta.class);
+        return r == null ? null : r.pasajero();
     }
 
-    public void modificar(String id, Pasajero pasajero) {
+    public void modificar(String id, PasajeroDTO pasajero) {
         restClient.put()
                 .uri("/api/pasajeros/{id}", id)
                 .body(pasajero)
