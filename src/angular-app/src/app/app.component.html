@@ -1,6 +1,38 @@
 <div class="wrap">
   <header>
-    <div class="brand">Ruta<span>Macht</span> · Panel</div>
+    <div class="brand">Ruta<span>Macht</span></div>
+    <div class="carretera">
+      <svg class="carrito" viewBox="0 0 140 64" width="120" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <!-- líneas de velocidad -->
+        <g class="velocidad" stroke="var(--accent)" stroke-width="3">
+          <path d="M2 24H18"/>
+          <path d="M8 34H22"/>
+          <path d="M4 44H16"/>
+        </g>
+
+        <g class="carro" transform="translate(26 0)" stroke="var(--text)" stroke-width="3">
+          <!-- cabina -->
+          <path d="M34 30L44 14Q46 11 50 11H76Q82 11 86 16L96 30Z" fill="var(--panel)"/>
+          <!-- ventanas -->
+          <path d="M45 28L51 16H62V28Z" fill="#F9D9A8"/>
+          <path d="M67 28V16H77Q80 16 82 19L88 28Z" fill="#F9D9A8"/>
+          <!-- carrocería -->
+          <path d="M10 40Q10 30 22 30H100Q112 30 112 40V44Q112 48 108 48H14Q10 48 10 44Z" fill="var(--accent)"/>
+          <!-- ruedas -->
+          <g class="rueda" style="transform-origin:32px 48px">
+            <circle cx="32" cy="48" r="9" fill="var(--panel)"/>
+            <circle cx="32" cy="48" r="4" fill="#F9D9A8" stroke-width="2"/>
+            <path d="M32 44V52" stroke-width="2"/>
+          </g>
+          <g class="rueda" style="transform-origin:88px 48px">
+            <circle cx="88" cy="48" r="9" fill="var(--panel)"/>
+            <circle cx="88" cy="48" r="4" fill="#F9D9A8" stroke-width="2"/>
+            <path d="M88 44V52" stroke-width="2"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+
     <div id="status-pill">
       <span class="dot" [class.up]="apiArriba === true" [class.down]="apiArriba === false"></span>
       <span>{{ apiArriba === null ? 'Comprobando API…' : (apiArriba ? 'API en línea' : 'API no disponible') }}</span>

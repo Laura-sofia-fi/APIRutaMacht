@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Vehiculo } from '../../models/vehiculo.model';
@@ -18,6 +18,7 @@ function vacio(): Vehiculo {
 export class VehiculosComponent implements OnInit {
   private service = inject(VehiculoService);
   private toast = inject(ToastService);
+  private cdr = inject(ChangeDetectorRef);
 
   vehiculos: Vehiculo[] = [];
   busqueda = '';
@@ -31,7 +32,10 @@ export class VehiculosComponent implements OnInit {
 
   cargar(): void {
     this.service.listar().subscribe({
-      next: (res) => (this.vehiculos = res.vehiculos || []),
+      next: (res) => {
+        this.vehiculos = res.vehiculos || [];
+        this.cdr.detectChanges();
+      },
       error: (e) => this.toast.show('No se pudieron cargar los vehículos: ' + this.msg(e), true),
     });
   }
