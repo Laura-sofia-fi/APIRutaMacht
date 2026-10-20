@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Pasajero } from '../../models/pasajero.model';
@@ -22,6 +22,7 @@ function vacio(): Pasajero {
 export class PasajerosComponent implements OnInit {
   private service = inject(PasajeroService);
   private toast = inject(ToastService);
+  private cdr = inject(ChangeDetectorRef);
 
   tiposDocumento = TIPOS_DOCUMENTO;
 
@@ -37,12 +38,15 @@ export class PasajerosComponent implements OnInit {
 
   cargar(): void {
     this.service.listar().subscribe({
-      next: (res) => (this.pasajeros = res.pasajeros || []),
+      next: (res) => {
+        this.pasajeros = res.pasajeros || [];
+        this.cdr.detectChanges();
+      },
       error: (e) => this.toast.show('No se pudieron cargar los pasajeros: ' + this.msg(e), true),
     });
   }
 
-  // Filtra en vivo solo por ID: muestra lo que coincida con lo que se va escribiendo
+  // Filtra en vivo solo por ID
   get filtrados(): Pasajero[] {
     const t = this.normalizar(this.busqueda);
     if (!t) return this.pasajeros;
@@ -53,7 +57,7 @@ export class PasajerosComponent implements OnInit {
     this.busqueda = '';
   }
 
-  // Ignora mayúsculas y tildes: "garcia" encuentra "García"
+  // Ignora mayúsculas y tildes
   private normalizar(v: unknown): string {
     return String(v ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
   }
@@ -102,7 +106,12 @@ export class PasajerosComponent implements OnInit {
   eliminar(p: Pasajero): void {
     if (!confirm('¿Eliminar este pasajero? Esta acción no se puede deshacer.')) return;
     this.service.eliminar(p.id).subscribe({
-      next: () => { this.toast.show('Pasajero eliminado correctamente.'); this.cargar(); },
+      next: () => {
+        this.pasajeros = this.pasajeros.filter((x) => x.id !== p.id);
+        this.cdr.detectChanges();
+        this.toast.show('Pasajero eliminado correctamente.');
+        this.cargar();
+      },
       error: (e) => this.toast.show(this.msg(e), true),
     });
   }

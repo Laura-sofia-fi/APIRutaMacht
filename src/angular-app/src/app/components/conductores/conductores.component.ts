@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Conductor } from '../../models/conductor.model';
@@ -23,6 +23,7 @@ function vacio(): Conductor {
 export class ConductoresComponent implements OnInit {
   private service = inject(ConductorService);
   private toast = inject(ToastService);
+  private cdr = inject(ChangeDetectorRef);
 
   tiposDocumento = TIPOS_DOCUMENTO;
 
@@ -38,7 +39,10 @@ export class ConductoresComponent implements OnInit {
 
   cargar(): void {
     this.service.listar().subscribe({
-      next: (res) => (this.conductores = res.conductores || []),
+      next: (res) => {
+        this.conductores = res.conductores || [];
+        this.cdr.detectChanges();
+      },
       error: (e) => this.toast.show('No se pudieron cargar los conductores: ' + this.msg(e), true),
     });
   }
