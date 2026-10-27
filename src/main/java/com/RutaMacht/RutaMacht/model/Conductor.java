@@ -4,11 +4,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @ToString(callSuper = true)
+@Document(collation = "Conductor")
 
 public class Conductor extends Persona{
     private String licencia;

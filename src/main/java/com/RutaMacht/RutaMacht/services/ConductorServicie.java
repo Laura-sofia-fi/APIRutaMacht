@@ -2,6 +2,7 @@ package com.RutaMacht.RutaMacht.services;
 
 import com.RutaMacht.RutaMacht.model.Conductor;
 import com.RutaMacht.RutaMacht.model.IActualizable;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@RequiredArgsConstructor
 public class ConductorServicie {
 
     private final List<Conductor> conductores = new ArrayList<>();
