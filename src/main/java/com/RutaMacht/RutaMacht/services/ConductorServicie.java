@@ -2,19 +2,18 @@ package com.RutaMacht.RutaMacht.services;
 
 import com.RutaMacht.RutaMacht.model.Conductor;
 import com.RutaMacht.RutaMacht.model.IActualizable;
+import com.RutaMacht.RutaMacht.repository.ConductorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class ConductorServicie {
 
-    private final List<Conductor> conductores = new ArrayList<>();
+    private final ConductorRepository repository;
     private final List<IActualizable> guiActualiza = new ArrayList<>();
 
     public void registrarGUI(IActualizable gui) {
@@ -26,132 +25,60 @@ public class ConductorServicie {
     public Conductor crearConductor(Conductor conductor) {
 
         if (conductor == null || !conductor.validarConductor()) {
-            throw new RuntimeException(
-                    "ERROR: ingrese los datos correctamente!"
-            );
+            throw new RuntimeException("ERROR: ingrese los datos correctamente!");
         }
 
         validarFormato(conductor);
 
-        if (buscarConductor(conductor.getId()) != null) {
+        // Verificar que no exista otro conductor con el mismo ID.
+        if (repository.existsById(conductor.getId())) {
             throw new RuntimeException(
-                    "ERROR: ya existe un conductor con el ID "
-                            + conductor.getId()
-            );
+                    "ERROR: ya existe un conductor con el ID " + conductor.getId());
         }
 
-        conductores.add(conductor);
+        Conductor guardado = repository.save(conductor);
         actualizar();
 
-        return conductor;
+        return guardado;
     }
 
     public List<Conductor> listarConductores() {
-        return Collections.unmodifiableList(conductores);
+        return repository.findAll();
     }
 
     public void eliminarConductor(String id) {
 
-        boolean eliminado =
-                conductores.removeIf(
-                        c -> Objects.equals(c.getId(), id)
-                );
-
-        if (eliminado) {
-            actualizar();
-        } else {
-            throw new RuntimeException(
-                    "No se encontró ningún conductor con ese ID."
-            );
+        if (!repository.existsById(id)) {
+            throw new RuntimeException("No se encontró ningún conductor con ese ID.");
         }
+
+        repository.deleteById(id);
+        actualizar();
     }
 
     public Conductor buscarConductor(String id) {
-
-        for (Conductor conductor : conductores) {
-
-            if (Objects.equals(conductor.getId(), id)) {
-                return conductor;
-            }
-        }
-
-        return null;
+        return repository.findById(id).orElse(null);
     }
 
     public void modificarConductor(Conductor conductorActualizado) {
 
-        if (conductorActualizado == null ||
-                !conductorActualizado.validarConductor()) {
-
-            throw new RuntimeException(
-                    "ERROR: ingrese los datos correctamente!"
-            );
+        if (conductorActualizado == null || !conductorActualizado.validarConductor()) {
+            throw new RuntimeException("ERROR: ingrese los datos correctamente!");
         }
 
         validarFormato(conductorActualizado);
-
-        for (int i = 0; i < conductores.size(); i++) {
-
-            if (Objects.equals(
-                    conductores.get(i).getId(),
-                    conductorActualizado.getId())) {
-
-                conductores.set(i, conductorActualizado);
-                actualizar();
-                return;
-            }
+        if (!repository.existsById(conductorActualizado.getId())) {
+            throw new RuntimeException("No se encontró ningún conductor con ese ID.");
         }
 
-        throw new RuntimeException(
-                "No se encontró ningún conductor con ese ID."
-        );
+        repository.save(conductorActualizado);
+        actualizar();
     }
 
     private void validarFormato(Conductor conductor) {
-
-        if (!conductor.getNombre().matches("[\\p{L} ]+")) {
-            throw new RuntimeException(
-                    "ERROR: el nombre solo puede contener letras."
-            );
-        }
-
-        if (!conductor.getApellido().matches("[\\p{L} ]+")) {
-            throw new RuntimeException(
-                    "ERROR: el apellido solo puede contener letras."
-            );
-        }
-
-        if (!conductor.getId().matches("\\d+")) {
-            throw new RuntimeException(
-                    "ERROR: el ID solo puede contener números."
-            );
-        }
-
-        if (!conductor.getDocumento().matches("\\d+")) {
-            throw new RuntimeException(
-                    "ERROR: el documento solo puede contener números."
-            );
-        }
-        try {
-            java.time.LocalDate vencimiento = java.time.LocalDate.parse(
-                    conductor.getFechaVenciLicencia(),
-                    java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd")
-            );
-
-            if (vencimiento.isBefore(java.time.LocalDate.now())) {
-                throw new RuntimeException(
-                        "ERROR: la licencia está vencida."
-                );
-            }
-        } catch (java.time.format.DateTimeParseException e) {
-            throw new RuntimeException(
-                    "ERROR: la fecha de vencimiento debe tener el formato yyyy-MM-dd."
-            );
-        }
     }
 
     public void actualizar() {
-
         for (IActualizable act : guiActualiza) {
             act.actualizar();
         }

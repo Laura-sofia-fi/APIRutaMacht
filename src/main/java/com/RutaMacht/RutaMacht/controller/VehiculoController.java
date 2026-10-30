@@ -15,28 +15,27 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class VehiculoController {
 
+    private final VehiculoServicio servicio;
+
     @PostMapping
-    public ResponseEntity<?> crear(
-            @RequestBody Vehiculo vehiculo) {
+    public ResponseEntity<?> crear(@RequestBody Vehiculo vehiculo) {
 
         try {
 
-            VehiculoServicio.crearVehiculo(vehiculo);
+            Vehiculo creado = servicio.crear(vehiculo);
 
             return ResponseEntity
                     .status(HttpStatus.CREATED)
                     .body(Map.of(
                             "mensaje", "Vehículo creado correctamente.",
-                            "vehiculo", vehiculo
+                            "vehiculo", creado
                     ));
 
         } catch (RuntimeException e) {
 
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of(
-                            "mensaje", e.getMessage()
-                    ));
+                    .body(Map.of("mensaje", e.getMessage()));
         }
     }
 
@@ -44,8 +43,7 @@ public class VehiculoController {
     @GetMapping
     public ResponseEntity<?> listar() {
 
-        List<Vehiculo> vehiculos =
-                VehiculoServicio.listarVehiculos();
+        List<Vehiculo> vehiculos = servicio.listar();
 
         if (vehiculos.isEmpty()) {
 
@@ -66,12 +64,34 @@ public class VehiculoController {
     }
 
 
-    @GetMapping("/{placa}")
-    public ResponseEntity<?> buscarPorPlaca(
-            @PathVariable String placa) {
+    @GetMapping("/{id}")
+    public ResponseEntity<?> buscarPorId(@PathVariable String id) {
 
-        Vehiculo vehiculo =
-                VehiculoServicio.buscarVehiculo(placa);
+        Vehiculo vehiculo = servicio.buscarPorId(id);
+
+        if (vehiculo == null) {
+
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(Map.of(
+                            "mensaje",
+                            "No se encontró un vehículo con el id " + id
+                    ));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(Map.of(
+                        "mensaje", "Vehículo encontrado correctamente.",
+                        "vehiculo", vehiculo
+                ));
+    }
+
+
+    @GetMapping("/placa/{placa}")
+    public ResponseEntity<?> buscarPorPlaca(@PathVariable String placa) {
+
+        Vehiculo vehiculo = servicio.buscarPorPlaca(placa);
 
         if (vehiculo == null) {
 
@@ -86,81 +106,64 @@ public class VehiculoController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(Map.of(
-                        "mensaje",
-                        "Vehículo encontrado correctamente.",
-                        "vehiculo",
-                        vehiculo
+                        "mensaje", "Vehículo encontrado correctamente.",
+                        "vehiculo", vehiculo
                 ));
     }
 
 
-    @PutMapping("/{placa}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> actualizar(
-            @PathVariable String placa,
+            @PathVariable String id,
             @RequestBody Vehiculo vehiculo) {
-
-        Vehiculo existente =
-                VehiculoServicio.buscarVehiculo(placa);
-
-        if (existente == null) {
-
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(Map.of(
-                            "mensaje",
-                            "No se encontró un vehículo con la placa " + placa
-                    ));
-        }
 
         try {
 
-            // Mantener la placa de la URL
-            vehiculo.setPlaca(placa);
+            Vehiculo actualizado = servicio.actualizar(id, vehiculo);
 
-            VehiculoServicio.modificarVehiculo(vehiculo);
+            if (actualizado == null) {
+
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body(Map.of(
+                                "mensaje",
+                                "No se encontró un vehículo con el id " + id
+                        ));
+            }
 
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(Map.of(
-                            "mensaje",
-                            "Vehículo actualizado correctamente.",
-                            "vehiculo",
-                            vehiculo
+                            "mensaje", "Vehículo actualizado correctamente.",
+                            "vehiculo", actualizado
                     ));
 
         } catch (RuntimeException e) {
 
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of(
-                            "mensaje", e.getMessage()
-                    ));
+                    .body(Map.of("mensaje", e.getMessage()));
         }
     }
 
 
-    @DeleteMapping("/{placa}")
-    public ResponseEntity<?> eliminar(
-            @PathVariable String placa) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminar(@PathVariable String id) {
 
-        try {
+        boolean eliminado = servicio.eliminar(id);
 
-            VehiculoServicio.eliminarVehiculo(placa);
-
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(Map.of(
-                            "mensaje",
-                            "Vehículo eliminado correctamente."
-                    ));
-
-        } catch (RuntimeException e) {
+        if (!eliminado) {
 
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .body(Map.of(
-                            "mensaje", e.getMessage()
+                            "mensaje",
+                            "No se encontró un vehículo con el id " + id
                     ));
         }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(Map.of("mensaje", "Vehículo eliminado correctamente."));
     }
 }

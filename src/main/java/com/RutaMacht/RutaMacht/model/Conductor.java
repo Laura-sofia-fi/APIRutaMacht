@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
@@ -13,6 +14,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collation = "Conductor")
 
 public class Conductor extends Persona{
+    @Id
+    private String id;
     private String licencia;
     private String categoriaLicencia;
     private String fechaVenciLicencia;
