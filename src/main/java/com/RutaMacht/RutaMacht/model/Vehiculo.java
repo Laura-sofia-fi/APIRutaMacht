@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Setter
 @NoArgsConstructor
 @ToString(callSuper = true)
-@Document(collation = "Vehiculo")
+@Document(collection = "vehiculo")
 
 public class Vehiculo {
     @Id
