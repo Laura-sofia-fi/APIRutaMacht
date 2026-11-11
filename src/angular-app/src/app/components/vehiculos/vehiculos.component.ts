@@ -6,7 +6,7 @@ import { VehiculoService } from '../../services/vehiculo.service';
 import { ToastService } from '../../services/toast.service';
 
 function vacio(): Vehiculo {
-  return { placa: '', marca: '', modelo: '', anio: new Date().getFullYear(), color: '', tipoCombustible: '', numeroChasis: '' };
+  return { id: '', placa: '', marca: '', modelo: '', anio: new Date().getFullYear(), color: '', tipoCombustible: '', numeroChasis: '', capacidadTotal: 5 };
 }
 
 @Component({
@@ -23,7 +23,7 @@ export class VehiculosComponent implements OnInit {
   vehiculos: Vehiculo[] = [];
   busqueda = '';
   modalAbierto = false;
-  editandoPlaca: string | null = null;
+  editandoId: string | null = null;
   form: Vehiculo = vacio();
 
   ngOnInit(): void {
@@ -57,14 +57,14 @@ export class VehiculosComponent implements OnInit {
   }
 
   abrirNuevo(): void {
-    this.editandoPlaca = null;
+    this.editandoId = null;
     this.form = vacio();
     this.modalAbierto = true;
   }
 
   abrirEditar(v: Vehiculo): void {
-    this.editandoPlaca = v.placa;
-    this.form = { ...v };
+    this.editandoId = v.id;
+    this.form = { ...v, capacidadTotal: v.capacidadTotal ?? null };
     this.modalAbierto = true;
   }
 
@@ -84,9 +84,13 @@ export class VehiculosComponent implements OnInit {
       this.toast.show('El campo "año" debe ser mayor a 0.', true);
       return;
     }
+    if (!this.form.capacidadTotal || this.form.capacidadTotal < 2) {
+      this.toast.show('El vehículo debe tener al menos 2 asientos en total, incluido el conductor.', true);
+      return;
+    }
 
-    if (this.editandoPlaca) {
-      this.service.actualizar(this.editandoPlaca, this.form).subscribe({
+    if (this.editandoId) {
+      this.service.actualizar(this.editandoId, this.form).subscribe({
         next: () => { this.toast.show('Vehículo actualizado correctamente.'); this.cerrar(); this.cargar(); },
         error: (e) => this.toast.show(this.msg(e), true),
       });
@@ -100,7 +104,7 @@ export class VehiculosComponent implements OnInit {
 
   eliminar(v: Vehiculo): void {
     if (!confirm('¿Eliminar este vehículo? Esta acción no se puede deshacer.')) return;
-    this.service.eliminar(v.placa).subscribe({
+    this.service.eliminar(v.id).subscribe({
       next: () => { this.toast.show('Vehículo eliminado correctamente.'); this.cargar(); },
       error: (e) => this.toast.show(this.msg(e), true),
     });

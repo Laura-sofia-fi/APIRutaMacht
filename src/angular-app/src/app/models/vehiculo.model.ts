@@ -1,4 +1,5 @@
 export interface Vehiculo {
+  id: string;
   placa: string;
   marca: string;
   modelo: string;
@@ -6,4 +7,5 @@ export interface Vehiculo {
   color: string;
   tipoCombustible: string;
   numeroChasis: string;
+  capacidadTotal: number | null;
 }

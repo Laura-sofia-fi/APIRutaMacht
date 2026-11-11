@@ -70,14 +70,15 @@ tbody tr:hover{background:var(--panel-2)}
 .field{display:flex;flex-direction:column;gap:6px}
 .field.full{grid-column:1/-1}
 label{font-size:12px;font-weight:500;color:var(--muted)}
-input,select{background:#fff;border:1px solid var(--line);border-radius:12px;color:var(--text);padding:10px 12px;font-size:14px;font-family:inherit}
-input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(226,59,46,.15)}
+input,select,textarea{background:#fff;border:1px solid var(--line);border-radius:12px;color:var(--text);padding:10px 12px;font-size:14px;font-family:inherit}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(226,59,46,.15)}
+textarea{width:100%;min-width:0;resize:vertical}
 
 .toast-wrap{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:60}
 .toast{background:var(--panel);border-left:4px solid var(--ok);padding:12px 18px;border-radius:14px;font-size:13px;box-shadow:var(--sombra)}
 .toast.err{border-left-color:var(--danger)}
 .field{min-width:0}
-input,select{width:100%;min-width:0}
+input,select,textarea{width:100%;min-width:0}
 .search-bar input{width:auto}
 .carretera{
   flex:1;
