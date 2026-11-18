@@ -1,0 +1,72 @@
+<section class="panel tema-viajes">
+  <div class="panel-head">
+    <h2>{{ viajes.length }} {{ viajes.length === 1 ? 'viaje programado' : 'viajes programados' }}</h2>
+    <button class="btn btn-accent" (click)="abrirNuevo()">+ Publicar viaje</button>
+  </div>
+
+  <div class="search-bar">
+    <input [(ngModel)]="busquedaOrigen" placeholder="Filtrar por origen…" (keyup.enter)="buscar()">
+    <input [(ngModel)]="busquedaDestino" placeholder="Filtrar por destino…" (keyup.enter)="buscar()">
+    <button class="btn btn-ghost btn-sm" (click)="buscar()">Buscar</button>
+  </div>
+
+  <table *ngIf="viajes.length">
+    <thead>
+      <tr><th>Ruta</th><th>Salida</th><th>Conductor</th><th>Vehículo</th><th>Cupos</th><th>Aporte</th><th></th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let viaje of viajes">
+        <td>
+          <strong>{{ viaje.origen }} → {{ viaje.destino }}</strong>
+          <div class="muted" *ngIf="viaje.paradas?.length">Paradas: {{ viaje.paradas.join(', ') }}</div>
+        </td>
+        <td class="muted">{{ viaje.fechaHoraSalida | date:'medium' }}</td>
+        <td class="muted">{{ nombreConductor(viaje.conductorId) }}</td>
+        <td class="muted">{{ placaVehiculo(viaje.vehiculoId) }}</td>
+        <td class="muted">{{ viaje.cuposDisponibles }} / {{ viaje.cupos }}</td>
+        <td class="muted">{{ viaje.aportePorCupo | currency:'COP':'symbol':'1.0-0' }}</td>
+        <td class="actions"><button class="btn btn-ghost btn-sm" (click)="cancelar(viaje)">Cancelar</button></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="empty" *ngIf="!viajes.length">No hay viajes programados que coincidan con la búsqueda.</div>
+</section>
+
+<div class="overlay" *ngIf="modalAbierto">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Publicar viaje</h2>
+      <button class="modal-close" (click)="cerrar()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Conductor *</label>
+        <select [(ngModel)]="form.conductorId">
+          <option value="">Selecciona un conductor</option>
+          <option *ngFor="let conductor of conductores" [value]="conductor.id">
+            {{ conductor.nombre }} {{ conductor.apellido }} · {{ conductor.id }}
+          </option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Vehículo *</label>
+        <select [(ngModel)]="form.vehiculoId" (ngModelChange)="alCambiarVehiculo()">
+          <option value="">Selecciona un vehículo</option>
+          <option *ngFor="let vehiculo of vehiculosAptos" [value]="vehiculo.id">
+            {{ vehiculo.placa }} · {{ vehiculo.capacidadTotal }} asientos
+          </option>
+        </select>
+      </div>
+      <div class="field"><label>Origen *</label><input [(ngModel)]="form.origen" maxlength="120"></div>
+      <div class="field"><label>Destino *</label><input [(ngModel)]="form.destino" maxlength="120"></div>
+      <div class="field"><label>Fecha y hora de salida *</label><input type="datetime-local" [min]="fechaMinima" [(ngModel)]="form.fechaHoraSalida"></div>
+      <div class="field"><label>Cupos para pasajeros *</label><input type="number" min="1" [max]="maximoCupos" [(ngModel)]="form.cupos"></div>
+      <div class="field"><label>Aporte por cupo (COP)</label><input type="number" min="0" step="1000" [(ngModel)]="form.aportePorCupo"></div>
+      <div class="field full"><label>Paradas (una por línea)</label><textarea rows="3" [(ngModel)]="form.paradasTexto" maxlength="1200"></textarea></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" (click)="cerrar()">Cancelar</button>
+      <button class="btn btn-accent" [disabled]="guardando" (click)="guardar()">{{ guardando ? 'Publicando…' : 'Publicar' }}</button>
+    </div>
+  </div>
+</div>

@@ -71,11 +71,13 @@
     <button class="tab" [class.active]="tab === 'conductores'" (click)="tab = 'conductores'">Conductores</button>
     <button class="tab" [class.active]="tab === 'vehiculos'" (click)="tab = 'vehiculos'">Vehículos</button>
     <button class="tab" [class.active]="tab === 'pasajeros'" (click)="tab = 'pasajeros'">Pasajeros</button>
+    <button class="tab" [class.active]="tab === 'viajes'" (click)="tab = 'viajes'">Viajes</button>
   </div>
 
   <app-conductores *ngIf="tab === 'conductores'"></app-conductores>
   <app-vehiculos *ngIf="tab === 'vehiculos'"></app-vehiculos>
   <app-pasajeros *ngIf="tab === 'pasajeros'"></app-pasajeros>
+  <app-viajes *ngIf="tab === 'viajes'"></app-viajes>
 </div>
 
 <div class="toast-wrap">

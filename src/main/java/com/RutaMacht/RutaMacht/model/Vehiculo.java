@@ -23,6 +23,7 @@ public class Vehiculo {
     private String color;
     private String tipoCombustible;
     private String numeroChasis;
+    private Integer capacidadTotal;
 
     public boolean validarVehiculo() {
         return getPlaca() != null && !getPlaca().isBlank() &&
@@ -31,6 +32,7 @@ public class Vehiculo {
                 getColor() != null && !getColor().isBlank() &&
                 getTipoCombustible() != null && !getTipoCombustible().isBlank() &&
                 getNumeroChasis() != null && !getNumeroChasis().isBlank() &&
+                getCapacidadTotal() != null && getCapacidadTotal() >= 2 &&
                 getAnio() > 0;
     }
 

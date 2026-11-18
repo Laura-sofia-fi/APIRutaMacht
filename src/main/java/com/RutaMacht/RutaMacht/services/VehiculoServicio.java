@@ -18,6 +18,7 @@ public class VehiculoServicio {
 
     public Vehiculo crear(Vehiculo vehiculo) {
 
+        validarCapacidad(vehiculo);
         if (vehiculo == null || !vehiculo.validarVehiculo()) {
             throw new RuntimeException("ERROR: ingrese los datos correctamente!");
         }
@@ -48,6 +49,7 @@ public class VehiculoServicio {
 
     public Vehiculo actualizar(String id, Vehiculo datosActualizados) {
 
+        validarCapacidad(datosActualizados);
         if (datosActualizados == null || !datosActualizados.validarVehiculo()) {
             throw new RuntimeException("ERROR: ingrese los datos correctamente!");
         }
@@ -73,11 +75,13 @@ public class VehiculoServicio {
 
         // Actualizar atributos (conservando el id existente).
         vehiculo.setPlaca(datosActualizados.getPlaca());
+        vehiculo.setAnio(datosActualizados.getAnio());
         vehiculo.setMarca(datosActualizados.getMarca());
+        vehiculo.setModelo(datosActualizados.getModelo());
         vehiculo.setColor(datosActualizados.getColor());
         vehiculo.setTipoCombustible(datosActualizados.getTipoCombustible());
         vehiculo.setNumeroChasis(datosActualizados.getNumeroChasis());
-        // ... agrega aquí cualquier otro atributo de Vehiculo ...
+        vehiculo.setCapacidadTotal(datosActualizados.getCapacidadTotal());
 
         // Guardar los cambios en MongoDB.
         return repository.save(vehiculo);
@@ -119,6 +123,13 @@ public class VehiculoServicio {
         if (!vehiculo.getPlaca().matches("[A-Za-z0-9]+")) {
             throw new RuntimeException(
                     "ERROR: la placa solo puede contener letras y números.");
+        }
+    }
+
+    private void validarCapacidad(Vehiculo vehiculo) {
+        if (vehiculo != null && (vehiculo.getCapacidadTotal() == null || vehiculo.getCapacidadTotal() < 2)) {
+            throw new RuntimeException(
+                    "La capacidad total debe ser de al menos 2 asientos, incluido el conductor.");
         }
     }
 }
