@@ -40,7 +40,7 @@
       <button class="modal-close" (click)="cerrar()">✕</button>
     </div>
     <div class="modal-body">
-      <div class="field"><label>ID *</label><input [(ngModel)]="form.id" [disabled]="!!editandoId"></div>
+      <div class="field"><label>ID {{ editandoId ? '' : '(opcional, se genera solo)' }}</label><input [(ngModel)]="form.id" [disabled]="!!editandoId" placeholder="Déjalo vacío para autogenerar"></div>
       <div class="field"><label>Nombre *</label><input [(ngModel)]="form.nombre"></div>
       <div class="field"><label>Apellido *</label><input [(ngModel)]="form.apellido"></div>
       <div class="field">

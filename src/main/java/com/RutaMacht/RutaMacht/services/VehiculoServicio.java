@@ -1,7 +1,9 @@
 package com.RutaMacht.RutaMacht.services;
 
+import com.RutaMacht.RutaMacht.model.EstadoViaje;
 import com.RutaMacht.RutaMacht.model.Vehiculo;
 import com.RutaMacht.RutaMacht.repository.VehiculoRepository;
+import com.RutaMacht.RutaMacht.repository.ViajeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,7 @@ public class VehiculoServicio {
     //private final List<Vehiculo> vehiculos = new ArrayList<>();
 
     private final VehiculoRepository repository;
+    private final ViajeRepository viajeRepository;
 
     public Vehiculo crear(Vehiculo vehiculo) {
 
@@ -92,6 +95,11 @@ public class VehiculoServicio {
         // Verificar que el vehículo exista.
         if (!repository.existsById(id)) {
             return false;
+        }
+
+        if (viajeRepository.existsByVehiculoIdAndEstado(id, EstadoViaje.PROGRAMADO)) {
+            throw new IllegalStateException(
+                    "No se puede eliminar: el vehículo tiene viajes programados. Cancélalos primero.");
         }
 
         // Eliminar el documento.

@@ -8,17 +8,17 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^20.1.8",
+    "@angular/animations": "^22.2.2",
     "@angular/common": "^22.2.2",
     "@angular/compiler": "^22.2.2",
     "@angular/core": "^22.2.2",
     "@angular/forms": "^22.2.2",
     "@angular/platform-browser": "^22.2.2",
-    "@angular/platform-browser-dynamic": "^20.0.7",
+    "@angular/platform-browser-dynamic": "^22.2.2",
     "@angular/router": "^22.2.2",
     "rxjs": "^7.8.0",
     "tslib": "^2.6.0",
-    "zone.js": "^0.14.0"
+    "zone.js": "~0.16.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^22.2.2",

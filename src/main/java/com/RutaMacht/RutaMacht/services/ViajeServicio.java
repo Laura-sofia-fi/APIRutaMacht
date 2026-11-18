@@ -76,6 +76,72 @@ public class ViajeServicio {
         return viajeRepository.save(viaje);
     }
 
+    public List<Viaje> listarTodos() {
+        return viajeRepository.findAll(Sort.by(Sort.Direction.ASC, "fechaHoraSalida"));
+    }
+
+    public Viaje actualizar(String id, CrearViajeRequest request) {
+        Viaje viaje = buscarPorId(id);
+        if (viaje.getEstado() != EstadoViaje.PROGRAMADO) {
+            throw new IllegalArgumentException("Solo se pueden modificar viajes programados.");
+        }
+
+        Conductor conductor = conductorRepository.findById(request.conductorId())
+                .orElseThrow(() -> new NoSuchElementException("No se encontró el conductor."));
+        if (Boolean.FALSE.equals(conductor.getEstado())) {
+            throw new IllegalArgumentException("El conductor está inactivo y no puede tener viajes.");
+        }
+        Vehiculo vehiculo = vehiculoRepository.findById(request.vehiculoId())
+                .orElseThrow(() -> new NoSuchElementException("No se encontró el vehículo."));
+        Integer capacidadTotal = vehiculo.getCapacidadTotal();
+        if (capacidadTotal == null || capacidadTotal < 2) {
+            throw new IllegalArgumentException("Completa la capacidad del vehículo antes de modificar el viaje.");
+        }
+
+        int maximoCupos = capacidadTotal - 1;
+        int reservados = viaje.getCupos() - viaje.getCuposDisponibles();
+        if (request.cupos() > maximoCupos) {
+            throw new IllegalArgumentException(
+                    "Este vehículo permite máximo " + maximoCupos + " cupos para pasajeros.");
+        }
+        if (request.cupos() < reservados) {
+            throw new IllegalArgumentException(
+                    "Ya hay " + reservados + " cupos reservados; no puedes dejar menos.");
+        }
+        if (request.origen().trim().equalsIgnoreCase(request.destino().trim())) {
+            throw new IllegalArgumentException("El origen y el destino deben ser diferentes.");
+        }
+        if (!request.fechaHoraSalida().isAfter(Instant.now())) {
+            throw new IllegalArgumentException("La fecha y hora de salida deben ser futuras.");
+        }
+
+        viaje.setConductorId(conductor.getId());
+        viaje.setVehiculoId(vehiculo.getId());
+        viaje.setOrigen(request.origen().trim());
+        viaje.setDestino(request.destino().trim());
+        viaje.setParadas(request.paradas() == null ? List.of() : request.paradas().stream()
+                .map(String::trim)
+                .toList());
+        viaje.setFechaHoraSalida(request.fechaHoraSalida());
+        viaje.setCupos(request.cupos());
+        viaje.setCuposDisponibles(request.cupos() - reservados);
+        viaje.setAportePorCupo(request.aportePorCupo());
+        return viajeRepository.save(viaje);
+    }
+
+    public void eliminar(String id) {
+        Viaje viaje = buscarPorId(id);
+        boolean hayReservasConfirmadas = mongoTemplate.exists(
+                Query.query(Criteria.where("viajeId").is(id).and("estado").is(EstadoReserva.CONFIRMADA)),
+                Reserva.class);
+        if (hayReservasConfirmadas) {
+            throw new IllegalArgumentException(
+                    "No se puede eliminar: el viaje tiene reservas confirmadas. Cancélalo primero.");
+        }
+        mongoTemplate.remove(Query.query(Criteria.where("viajeId").is(id)), Reserva.class);
+        viajeRepository.delete(viaje);
+    }
+
     public List<Viaje> buscarProgramados(String origen, String destino, Instant desde, Instant hasta) {
         Instant ahora = Instant.now();
         Instant inicio = desde == null || desde.isBefore(ahora) ? ahora : desde;

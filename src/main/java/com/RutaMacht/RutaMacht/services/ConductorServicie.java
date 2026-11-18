@@ -1,8 +1,10 @@
 package com.RutaMacht.RutaMacht.services;
 
 import com.RutaMacht.RutaMacht.model.Conductor;
+import com.RutaMacht.RutaMacht.model.EstadoViaje;
 import com.RutaMacht.RutaMacht.model.IActualizable;
 import com.RutaMacht.RutaMacht.repository.ConductorRepository;
+import com.RutaMacht.RutaMacht.repository.ViajeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import java.util.List;
 public class ConductorServicie {
 
     private final ConductorRepository repository;
+    private final ViajeRepository viajeRepository;
     private final List<IActualizable> guiActualiza = new ArrayList<>();
 
     public void registrarGUI(IActualizable gui) {
@@ -30,10 +33,14 @@ public class ConductorServicie {
 
         validarFormato(conductor);
 
-        // Verificar que no exista otro conductor con el mismo ID.
-        if (repository.existsById(conductor.getId())) {
-            throw new RuntimeException(
-                    "ERROR: ya existe un conductor con el ID " + conductor.getId());
+        // El id es opcional: si no se envía, MongoDB lo genera.
+        if (conductor.getId() != null && !conductor.getId().isBlank()) {
+            if (repository.existsById(conductor.getId())) {
+                throw new RuntimeException(
+                        "ERROR: ya existe un conductor con el ID " + conductor.getId());
+            }
+        } else {
+            conductor.setId(null);
         }
 
         Conductor guardado = repository.save(conductor);
@@ -50,6 +57,10 @@ public class ConductorServicie {
 
         if (!repository.existsById(id)) {
             throw new RuntimeException("No se encontró ningún conductor con ese ID.");
+        }
+        if (viajeRepository.existsByConductorIdAndEstado(id, EstadoViaje.PROGRAMADO)) {
+            throw new IllegalStateException(
+                    "No se puede eliminar: el conductor tiene viajes programados. Cancélalos primero.");
         }
 
         repository.deleteById(id);

@@ -81,7 +81,7 @@ export class ConductoresComponent implements OnInit {
 
   guardar(): void {
     const requeridos: (keyof Conductor)[] = [
-      'id', 'nombre', 'apellido', 'tipoDocumento', 'documento',
+      'nombre', 'apellido', 'tipoDocumento', 'documento',
       'telefono', 'correo', 'licencia', 'categoriaLicencia', 'fechaVenciLicencia',
     ];
     for (const campo of requeridos) {
